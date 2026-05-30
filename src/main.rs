@@ -1,74 +1,62 @@
-
-
 mod nn;
-use nn::mat::Matrix;
+
 use nn::layer::Layer;
-
-struct NeuralNet{
-
-}
-
-impl NeuralNet {
-
-    fn f_foward(){
-
-    }
-
-    fn loss(out:&Matrix, Y:&Matrix){
-        
-    }
-    
-    fn back_prop(){
-
-    }
-}
+use nn::mat::Matrix;
+use nn::nn::NeuralNet;
+use nn::nn::{train, predict};
 
 
 
-// fn train(){
-
-// }
-
-fn sigmoid(x:&Matrix) -> Matrix{
-    let mut result:Matrix = Matrix::new(x.rows, x.cols); 
-    let mut r:f32;
-    for i in 0..x.rows{
-        for j in 0..x.cols{
-            
-            r = 1.0 + (-x.get(i,j).exp());
-            r = 1.0/r;    
-            result.set(i,j, r)
-        }
-    }
-    return result;
-}
-
-// fn evaluate(){
-
-// }
 
 
 fn main() {
-    let mut a = Matrix::new(2, 3);
-    // fill with some values
-    for i in 0..2 {
-        for j in 0..3 {
-            a.set(i, j, (i * 3 + j + 1) as f32);
-        }
-    }
+    // Usando dados do XOR como exemplo
+    let mut data: Vec<Matrix> = vec![
+        Matrix::new(1, 2),
+        Matrix::new(1, 2),
+        Matrix::new(1, 2),
+        Matrix::new(1, 2),
+    ];
 
-    let mut b = Matrix::new(3, 2);
-    for i in 0..3 {
-        for j in 0..2 {
-            b.set(i, j, (i * 2 + j + 1) as f32);
-        }
-    }
+    data[0].set(0, 0, 0.0);
+    data[0].set(0, 1, 0.0); // [0, 0]
+    data[1].set(0, 0, 0.0); 
+    data[1].set(0, 1, 1.0); // [0, 1]
+    data[2].set(0, 0, 1.0);
+    data[2].set(0, 1, 0.0); // [1, 0]
+    data[3].set(0, 0, 1.0);
+    data[3].set(0, 1, 1.0); // [1, 1]
 
-    println!("{a}");
+    let mut y: Vec<Matrix> = vec![
+        Matrix::new(1, 1),
+        Matrix::new(1, 1),
+        Matrix::new(1, 1),
+        Matrix::new(1, 1),  
+    ];
 
-    let c = sigmoid(&a);
-    println!("{}", c);
+    y[0].set(0, 0, 0.0); // [0, 0] -> 0
+    y[1].set(0, 0, 1.0); // [0, 1] -> 1
+    y[2].set(0, 0, 1.0); // [1, 0] -> 1
+    y[3].set(0, 0, 0.0); // [1, 1] -> 0
 
-    let d = &a + &a;
-    println!("{d}");
+    let mut model = NeuralNet {
+        layers: vec![Layer::new(2, 4, 4, 1)],
+    };
+
+    let epochs = 100000;
+    let lr: f32 = 0.01; // learning rate    
+
+    train(&data, &y, &mut model, epochs, lr);
+
+    let mut test = Matrix::new(1, 2);
+    let a = 0.0;
+    let b: f32 = 1.0;
+
+
+    test.set(0, 0, a);
+    test.set(0, 1, b);   
+
+
+    println!("Test input: [{a}, {b}]");
+    println!("Prediction: {}", predict(test, &model));  
 }

@@ -1,63 +1,70 @@
-use rand::Rng;
-
+use rand::prelude::*;
+use crate::nn::mat::Matrix;
 pub struct Layer {
-    pub w1: Vec<f32>,
-    pub rows1: usize,
-    pub cols1: usize,
+    pub w1: Matrix,
+    pub b1: Matrix,
 
-    pub w2: Vec<f32>,
-    pub rows2:usize,
-    pub cols2:usize
+    pub w2: Matrix,
+    pub b2: Matrix,     
+
 }
 
-
-impl Layer{
-
-    pub fn new(rows1: usize, cols1: usize, rows2:usize, cols2: usize) -> Self {
+impl Layer {
+    pub fn new(rows1: usize, cols1: usize, rows2: usize, cols2: usize) -> Self {
         let mut l = Layer {
-            w1: vec![0.0; rows1 * cols1],
-            rows1,
-            cols1,
-
-            w2: vec![0.0; rows2*cols2],
-            rows2,
-            cols2
+            w1: Matrix::new(rows1, cols1),
+            b1: Matrix::new(1, cols1),
+            w2: Matrix::new(rows2, cols2),
+            b2: Matrix::new(1, cols2),
         };
 
         l.gen_ws();
         l
     }
 
-    pub fn get(){
 
-    }
 
-    pub fn set_w1(&mut self, i: usize, j: usize, val: f32) {
-        self.w1[i * self.cols1 + j] = val;
-    }
-
-    pub fn set_w2(&mut self, i: usize, j: usize, val: f32) {
-        self.w2[i * self.cols2 + j] = val;
-    }
-    
-    pub fn gen_ws(&mut self){
+    pub fn gen_ws(&mut self) {
         let mut rng = rand::rng();
-        for i in 0..self.rows1{
-            for j in 0..self.cols1{
-                let val:f32 = rng.random();
-                self.set_w1(i, j, val);
+        for j in 0..self.w1.cols {
+            for i in 0..self.w1.rows     {
+                let val: f32 = rng.random_range(-1.0..1.0);
+                self.w1.set(i, j, val);
             }
+            let val: f32 = rng.random_range(-1.0..1.0);
+            self.b1.set(0, j, val);
         }
 
-        for i in 0..self.rows2{
-            for j in 0..self.cols2{
-                let val:f32 = rng.random();
-                self.set_w2(i, j, val);
+        for j in 0..self.w2.cols {
+            for i in 0..self.w2.rows {
+                let val: f32 = rng.random_range(-1.0..1.0);
+                self.w2.set(i, j, val);
             }
+            let val: f32 = rng.random_range(-1.0..1.0);
+            self.b2.set(0, j, val);
         }
-
     }
+}
+
+use std::fmt;
 
 
-} 
-    
+impl fmt::Display for Layer {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        for i in 0..self.w1.rows {
+            for j in 0..self.w1.cols {
+                write!(f, "{:.2} ", self.w1.get(i, j))?;
+            }
+            writeln!(f)?;
+        }
+        writeln!(f, "-----------------")?;
+        for i in 0..self.w2.rows {
+            for j in 0..self.w2.cols {
+                write!(f, "{:.2} ", self.w2.get(i, j))?;
+            }
+            writeln!(f)?;
+        }
+
+        Ok(())
+    }
+}

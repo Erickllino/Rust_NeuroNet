@@ -1,3 +1,4 @@
+use rand::prelude::*;
 pub struct Matrix {
     pub data: Vec<f32>,
     pub rows: usize,
@@ -25,6 +26,11 @@ impl Matrix {
         self.data[i * self.cols + j] = val;
     }
 
+    pub fn full_set(&mut self, r: Matrix) {
+        assert_eq!(self.rows, r.rows);
+        assert_eq!(self.cols, r.cols);
+        self.data = r.data;
+    }
 
     pub fn dot(&self, other: &Matrix) -> Matrix {
         assert_eq!(self.cols, other.rows, "dimension mismatch");
@@ -39,6 +45,21 @@ impl Matrix {
         }
         result
     }
+
+    pub fn transpose(&self) -> Matrix {
+        let mut result = Matrix::new(self.cols, self.rows);
+        for i in 0..self.rows {
+            for j in 0..self.cols {
+                result.set(j, i, self.get(i, j));
+            }
+        }
+        result
+    }
+
+    pub fn sum(&self) -> f32 {
+        self.data.iter().sum()
+    }
+
 }
 
 
@@ -100,6 +121,21 @@ impl Mul<f32> for &Matrix {
     }
 }
 
+// Hadamard product (element-wise multiplication)
+impl Mul<&Matrix> for &Matrix {
+    type Output = Matrix;
+    fn mul(self, other: &Matrix) -> Matrix {
+        assert_eq!(self.rows, other.rows);
+        assert_eq!(self.cols, other.cols);
+        let data = self.data
+            .iter()
+            .zip(other.data.iter())
+            .map(|(a, b)| a * b)
+            .collect();
+        Matrix { data, rows: self.rows, cols: self.cols }
+    }
+}
+
 // Negate -Matrix
 impl Neg for &Matrix {
     type Output = Matrix;
@@ -107,4 +143,17 @@ impl Neg for &Matrix {
         let data = self.data.iter().map(|x| -x).collect();
         Matrix { data, rows: self.rows, cols: self.cols }
     }
+}
+
+
+pub fn random_matrix(rows: usize, cols: usize) -> Matrix {
+    let mut m = Matrix::new(rows, cols);
+    let mut rng = rand::rng();
+    for i in 0..rows {
+        for j in 0..cols {
+            let val: f32 = rng.random_range(-1.0..1.0);
+            m.set(i, j, val);
+        }
+    }
+    m
 }

@@ -2,14 +2,14 @@ use rand::prelude::*;
 use crate::nn::mat::Matrix;
 pub struct Layer {
     pub w: Matrix,
-    pub b: Matrix,
+    pub b : Matrix,
 }
 
 impl Layer {
     pub fn new(rows1: usize, cols1: usize) -> Self {
         let mut l = Layer {
             w: Matrix::new(rows1, cols1),
-            b: Matrix::new(1, cols1),
+            b : Matrix::new(1, cols1),
         };
 
         l.gen_ws();
@@ -25,7 +25,8 @@ impl Layer {
                 let val: f32 = rng.random_range(-1.0..1.0);
                 self.w.set(i, j, val);
             }
-            let val: f32 = rng.random_range(-1.0..1.0);
+            let range = 1.0 / (self.w.rows as f32).sqrt();
+            let val: f32 = rng.random_range(-range..range);
             self.b.set(0, j, val);
         }
     }

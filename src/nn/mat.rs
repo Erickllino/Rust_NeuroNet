@@ -1,10 +1,11 @@
 use rand::prelude::*;
+
+#[derive(Clone)]
 pub struct Matrix {
     pub data: Vec<f32>,
     pub rows: usize,
     pub cols: usize,
 }
-
 
 impl Matrix {
     // "static method" / constructor — no `self`
@@ -59,9 +60,7 @@ impl Matrix {
     pub fn sum(&self) -> f32 {
         self.data.iter().sum()
     }
-
 }
-
 
 use std::fmt;
 
@@ -77,7 +76,7 @@ impl fmt::Display for Matrix {
     }
 }
 
-use std::ops::{Add, Sub, Mul, Neg};
+use std::ops::{Add, Mul, Neg, Sub};
 
 impl Add for &Matrix {
     type Output = Matrix;
@@ -86,13 +85,18 @@ impl Add for &Matrix {
         assert_eq!(self.rows, other.rows);
         assert_eq!(self.cols, other.cols);
 
-        let data = self.data
+        let data = self
+            .data
             .iter()
             .zip(other.data.iter())
             .map(|(a, b)| a + b)
             .collect();
 
-        Matrix { data, rows: self.rows, cols: self.cols }
+        Matrix {
+            data,
+            rows: self.rows,
+            cols: self.cols,
+        }
     }
 }
 
@@ -102,13 +106,18 @@ impl Sub for &Matrix {
         assert_eq!(self.rows, other.rows);
         assert_eq!(self.cols, other.cols);
 
-        let data = self.data
+        let data = self
+            .data
             .iter()
             .zip(other.data.iter())
             .map(|(a, b)| a - b)
             .collect();
 
-        Matrix { data, rows: self.rows, cols: self.cols }
+        Matrix {
+            data,
+            rows: self.rows,
+            cols: self.cols,
+        }
     }
 }
 
@@ -117,7 +126,11 @@ impl Mul<f32> for &Matrix {
     type Output = Matrix;
     fn mul(self, scalar: f32) -> Matrix {
         let data = self.data.iter().map(|x| x * scalar).collect();
-        Matrix { data, rows: self.rows, cols: self.cols }
+        Matrix {
+            data,
+            rows: self.rows,
+            cols: self.cols,
+        }
     }
 }
 
@@ -127,12 +140,17 @@ impl Mul<&Matrix> for &Matrix {
     fn mul(self, other: &Matrix) -> Matrix {
         assert_eq!(self.rows, other.rows);
         assert_eq!(self.cols, other.cols);
-        let data = self.data
+        let data = self
+            .data
             .iter()
             .zip(other.data.iter())
             .map(|(a, b)| a * b)
             .collect();
-        Matrix { data, rows: self.rows, cols: self.cols }
+        Matrix {
+            data,
+            rows: self.rows,
+            cols: self.cols,
+        }
     }
 }
 
@@ -141,11 +159,15 @@ impl Neg for &Matrix {
     type Output = Matrix;
     fn neg(self) -> Matrix {
         let data = self.data.iter().map(|x| -x).collect();
-        Matrix { data, rows: self.rows, cols: self.cols }
+        Matrix {
+            data,
+            rows: self.rows,
+            cols: self.cols,
+        }
     }
 }
 
-
+#[allow(dead_code)]
 pub fn random_matrix(rows: usize, cols: usize) -> Matrix {
     let mut m = Matrix::new(rows, cols);
     let mut rng = rand::rng();

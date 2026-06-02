@@ -20,13 +20,14 @@ impl Layer {
 
     pub fn gen_ws(&mut self) {
         let mut rng = rand::rng();
+        let range = 1.0 / (self.w.rows as f32).sqrt();
         for j in 0..self.w.cols {
             for i in 0..self.w.rows     {
-                let val: f32 = rng.random_range(-1.0..1.0);
+                let val: f32 = rng.random_range(-range..range);
                 self.w.set(i, j, val);
             }
-            let range = 1.0 / (self.w.rows as f32).sqrt();
-            let val: f32 = rng.random_range(-range..range);
+            
+            let val: f32 = rng.random_range(-1.0..1.0);
             self.b.set(0, j, val);
         }
     }

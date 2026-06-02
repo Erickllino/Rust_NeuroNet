@@ -1,5 +1,6 @@
-use crate::nn::mat::Matrix;     
+use crate::nn::mat::Matrix;
 use crate::nn::layer::Layer;
+use std::io::Write;
 pub struct NeuralNet {
     pub layers: Vec<Layer>,
 }
@@ -133,22 +134,27 @@ pub fn train(data: Vec<Matrix>, y: Vec<Matrix>, model:&mut NeuralNet, epochs: us
     let mut losses: Vec<f32> = Vec::new();
     let mut out: Matrix ;
 
+    let starting_time = std::time::Instant::now();
     for k in 0..epochs {
-        let mut mean_loss: f32 = 0.0;   
+        tqdm_bar(k, epochs);
+        println!("");
         for i in 0..data.len() {
             
-
-            out = model.f_foward(&data[i]);
-    
-            
             model.back_prop(&data[i], &y[i], lr);
-            let loss = NeuralNet::loss(&out, &y[0]);
-            mean_loss += loss;
+
+            // Update time and print time remaining
+            let elapsed = starting_time.elapsed();
+            print!("\rElapsed: {:.2?}", elapsed);
+
         }
-        mean_loss /= data.len() as f32;
-        losses.push(mean_loss);
-        tqdm_bar(k, epochs);
-        
+        println!("");
+        out = model.f_foward(&data[0]);
+        let loss = NeuralNet::loss(&out, &y[0]);
+
+        losses.push(loss);
+       
+        print!("\x1B[2J\x1B[1;1H");
+        std::io::stdout().flush().unwrap();
     }
     println!()
 }
@@ -161,8 +167,7 @@ pub fn predict(data: Matrix, model: NeuralNet) -> Matrix {
 #[allow(dead_code)]
 pub fn tqdm(i:usize, total: usize) {
     let percent = (i as f32 / total as f32) * 100.0;
-    print!("\rProgress: {:.2}%", percent);      
-    
+    print!("\rProgress: {:.2}%", percent);         
 }
 #[allow(dead_code)]
 pub fn tqdm_bar(i:usize, total: usize) {
